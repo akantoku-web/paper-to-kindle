@@ -1,0 +1,7 @@
+const $=id=>document.getElementById(id);let job={};
+const labels={starting:'準備',loading:'画像の読み込み',translation:'日本語訳を確認',printing:'PDFを作成',amazon:'Amazonを開く',upload:'送信準備',sending:'送信中',accepted:'Amazon受付済み',error:'操作が必要です',paused:'停止中'};
+async function refresh(){job=(await chrome.storage.local.get('job')).job||{};$('stage').textContent=labels[job.state]||'待機中';$('message').textContent=job.message||'論文ページで拡張のアイコンを押してください。';$('filename').textContent=job.filename||'';$('download').hidden=!job.hasPDF;$('amazon').hidden=!job.amazonTab;$('source').hidden=!job.sourceTab;const res=await chrome.runtime.sendMessage({type:'running'});$('cancel').hidden=!res?.active;$('clear').disabled=!!res?.active;}
+chrome.storage.onChanged.addListener(refresh);await refresh();
+async function message(type){const r=await chrome.runtime.sendMessage({type});if(r?.error)throw new Error(r.error);return r;}
+for(const name of ['download','cancel','clear'])$(name).onclick=async()=>{try{await message(name);$('feedback').textContent=name==='clear'?'この拡張に保存したPDFと履歴を消去しました。Amazonのライブラリは変更していません。':name==='cancel'?'停止を要求しました。':'';await refresh();}catch(e){$('feedback').textContent=e.message;}};
+for(const [name,key] of [['amazon','amazonTab'],['source','sourceTab']])$(name).onclick=async()=>{try{const t=await chrome.tabs.update(job[key],{active:true});await chrome.windows.update(t.windowId,{focused:true});}catch{$('feedback').textContent='元のタブは閉じられています。';}};

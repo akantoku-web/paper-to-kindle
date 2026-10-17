@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "論文をKindleへ",
+  "version": "1.0.0",
+  "description": "Chromeで日本語訳した論文ページを印刷PDFにし、AmazonのSend to Kindleへ送ります。",
+  "minimum_chrome_version": "118",
+  "permissions": ["activeTab", "debugger", "storage", "scripting", "downloads"],
+  "optional_host_permissions": ["https://www.amazon.co.jp/*"],
+  "background": {"service_worker": "background.js", "type": "module"},
+  "action": {"default_title": "この論文をKindleへ"},
+  "options_page": "options.html",
+  "icons": {"48": "icon48.png", "128": "icon128.png"}
+}
